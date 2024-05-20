@@ -1,8 +1,11 @@
 package at.htl.todo.ui.layout
 
+import android.content.Intent
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +19,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
@@ -34,9 +37,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import at.htl.todo.DetailsActivity
 import at.htl.todo.model.Model
 import at.htl.todo.model.ModelStore
 import at.htl.todo.model.Todo
@@ -63,7 +68,7 @@ class MainView @Inject constructor() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                SimpleCenterAlignedTopAppBar()
+                CenterAlignedTopAppBar()
                 TodosList(model = viewModel, modifier = Modifier.padding(all = 32.dp), store)
             }
         }
@@ -74,7 +79,12 @@ class MainView @Inject constructor() {
 fun TodosList(model: Model, modifier: Modifier = Modifier, store: ModelStore) {
     val todos = model.todos
     LazyColumn(
-        modifier = modifier.padding(16.dp)
+        modifier = modifier.padding(
+            start = 16.dp,
+            top = 40.dp,
+            end = 16.dp,
+            bottom = 16.dp
+        )
     ) {
         items(todos.size) { index ->
             TodoRow(todo  = todos[index], store)
@@ -85,12 +95,18 @@ fun TodosList(model: Model, modifier: Modifier = Modifier, store: ModelStore) {
 
 @Composable
 fun TodoRow(todo: Todo, store: ModelStore) {
+    val context = LocalContext.current
+
+    // Create a launcher for starting the activity
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { /* Handle the result if needed */ }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clip(RoundedCornerShape(16.dp)),
-        onClick = {  }
+            .clip(RoundedCornerShape(16.dp))
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -132,6 +148,20 @@ fun TodoRow(todo: Todo, store: ModelStore) {
                     }
                 }
             )
+            IconButton(onClick = {
+                // Create an intent to start the DetailsActivity
+                val intent = Intent(context, DetailsActivity::class.java).apply {
+                    // Pass data as an extra with the intent
+                    putExtra("ID", todo.id.toString())
+                }
+                // Start the activity using the launcher
+                launcher.launch(intent)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "Info button"
+                )
+            }
         }
     }
 }
@@ -153,24 +183,16 @@ fun ChipView(text: String, color: Color) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimpleCenterAlignedTopAppBar() {
+fun CenterAlignedTopAppBar() {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Todos",
+                        "Todos App",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description"
-                        )
-                    }
                 }
             )
         },
