@@ -109,18 +109,11 @@ fun TodoRow(todo: Todo, store: ModelStore) {
             .clip(RoundedCornerShape(16.dp))
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            ChipView(text = todo.id.toString(), color = Color.Green)
-        }
-
-        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
                     start = 16.dp,
-                    top = 0.dp,
+                    top = 10.dp,
                     end = 16.dp,
                     bottom = 0.dp
                 ),
@@ -163,21 +156,6 @@ fun TodoRow(todo: Todo, store: ModelStore) {
                 )
             }
         }
-    }
-}
-
-@Composable
-fun ChipView(text: String, color: Color) {
-    Box(
-        modifier = Modifier
-            .wrapContentWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(color.copy(.08f))
-    ) {
-        Text(
-            text = text, modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
-            style = MaterialTheme.typography.titleSmall
-        )
     }
 }
 

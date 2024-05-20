@@ -9,10 +9,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -21,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,14 +78,14 @@ class DetailsView @Inject constructor() {
             ) {
                 CenterAlignedDetailsTopAppBar()
                 TodoDetails(model = viewModel,
-                    modifier = Modifier.padding(all = 32.dp), todoId)
+                    modifier = Modifier.padding(all = 32.dp), todoId, store)
             }
         }
     }
 }
 
 @Composable
-fun TodoDetails(model: Model, modifier: Modifier = Modifier, todoId: String) {
+fun TodoDetails(model: Model, modifier: Modifier = Modifier, todoId: String, store: ModelStore) {
     val todos = model.todos
     Log.i(TAG, "TodoId: $todoId")
 
@@ -112,20 +116,63 @@ fun TodoDetails(model: Model, modifier: Modifier = Modifier, todoId: String) {
                             .padding(10.dp)
                             .background(color = Color(0xFFF7F2F9))
                     ) {
-                        Text(
-                            text = todo.title,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Text(
-                            text = todo.id.toString(), fontSize = 16.sp,
-                            modifier = Modifier.padding(top = 8.dp),
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            ChipView(
+                                text = todo.id.toString(),
+                                color = Color.Green,
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = todo.title,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Checkbox(
+                                checked = todo.completed,
+                                onCheckedChange = {
+                                    store.apply { m ->
+                                        m.todos.first { t -> t.id == todo.id }.completed =
+                                            !todo.completed
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ChipView(text: String, color: Color) {
+    Box(
+        modifier = Modifier
+            .wrapContentWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(color.copy(.08f))
+    ) {
+        Text(
+            text = text, modifier = Modifier.padding(12.dp, 6.dp, 12.dp, 6.dp),
+            style = MaterialTheme.typography.titleSmall
+        )
     }
 }
 
