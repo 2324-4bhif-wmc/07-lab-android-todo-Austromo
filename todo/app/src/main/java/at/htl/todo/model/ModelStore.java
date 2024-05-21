@@ -15,4 +15,12 @@ public class ModelStore extends Store<Model>  {
     public void setTodos(Todo[] todos) {
         apply(model -> model.todos = todos);
     }
+
+    public void selectView(int viewIndex) {
+        apply(model -> model.uiState.selectedView = viewIndex);
+    }
+
+    public void setTodoDetailsId(Long newTodoDetailsId) {
+        apply(model -> model.todoDetailsId = newTodoDetailsId);
+    }
 }
