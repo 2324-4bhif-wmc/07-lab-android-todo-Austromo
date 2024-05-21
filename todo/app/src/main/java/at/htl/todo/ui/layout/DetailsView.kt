@@ -56,38 +56,11 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 import javax.inject.Singleton
 
-val TAG = DetailsView::class.simpleName
-
-@Singleton
-class DetailsView @Inject constructor() {
-
-    @Inject
-    lateinit var store: ModelStore
-
-    fun buildContent(activity: ComponentActivity, todoId: String) {
-        activity.enableEdgeToEdge()
-        activity.setContent {
-            val viewModel = store
-                .pipe
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeAsState(initial = Model())
-                .value
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                CenterAlignedDetailsTopAppBar()
-                TodoDetails(model = viewModel,
-                    modifier = Modifier.padding(all = 32.dp), todoId, store)
-            }
-        }
-    }
-}
+//val TAG = DetailsView::class.simpleName
 
 @Composable
 fun TodoDetails(model: Model, modifier: Modifier = Modifier, todoId: String, store: ModelStore) {
     val todos = model.todos
-    Log.i(TAG, "TodoId: $todoId")
 
     LazyColumn(
         modifier = modifier.padding(
